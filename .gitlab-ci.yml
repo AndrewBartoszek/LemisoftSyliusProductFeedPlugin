@@ -1,0 +1,143 @@
+image: tiangolo/docker-with-compose
+
+cache: &global_cache
+    key: ${CI_COMMIT_REF_SLUG}
+    untracked: true
+    policy: pull-push
+    paths:
+        - vendor/
+        - node_modules/
+        - .phpcs-cache
+        - .env.local
+
+stages:
+    - build
+    - quality
+    - tests
+    - publish
+
+#
+# Budowanie dockera
+#
+docker-build:
+    stage: build
+    script:
+        - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN $CI_REGISTRY
+        - docker compose build
+
+#
+# Budowanie projektu
+#
+app-build:
+    stage: build
+    cache:
+        <<: *global_cache
+        policy: pull-push
+    script:
+        - make rn install
+
+#
+# Weryfikacja czy w kodzie występują magiczne liczby
+#
+phpmnd:
+    stage: quality
+    cache:
+        <<: *global_cache
+        policy: pull
+    script:
+        - make rn phpmnd
+
+#
+# Weryfikacja składni kodu
+#
+phpstan:
+    stage: quality
+    cache:
+        <<: *global_cache
+        policy: pull-push
+    script:
+        -  make rn phpstan
+
+#
+# Weryfikacja jakości kodu
+#
+phpcs:
+    stage: quality
+    cache:
+        <<: *global_cache
+        policy: pull-push
+    script:
+        - make rn phpcs
+
+#
+# Weryfikacja jakości kodu
+#
+ecs:
+    stage: quality
+    cache:
+        <<: *global_cache
+        policy: pull
+    script:
+        - make rn ecs
+
+#
+# Weryfikacja jakości kodu js
+#
+#eslint:
+#    stage: quality
+#    cache:
+#        <<: *global_cache
+#        policy: pull-push
+#    script:
+#        - make rn eslint
+
+#
+# Weryfikacja jakości kodu
+#
+psalm:
+    stage: quality
+    cache:
+        <<: *global_cache
+        policy: pull
+    script:
+        - make rn psalm
+
+phpunit:
+    stage: tests
+    cache:
+        <<: *global_cache
+        policy: pull-push
+    script:
+        - make rn phpunit
+
+phpspec:
+    stage: tests
+    cache:
+        <<: *global_cache
+        policy: pull
+    script:
+        - make rn phpspec
+
+.publish_job:
+    stage: publish
+    variables:
+        URL: "${CI_API_V4_URL}/projects/$CI_PROJECT_ID/packages/composer"
+    script:
+        - 'curl --header "Job-Token: $CI_JOB_TOKEN" --data $VERSION $URL'
+
+publish:
+    extends: .publish_job
+    variables:
+        VERSION: "tag=${CI_COMMIT_TAG}"
+    only:
+        refs:
+            - tags
+
+publish_test:
+    extends: .publish_job
+    variables:
+        VERSION: "branch=${CI_COMMIT_REF_NAME}"
+    only:
+        refs:
+            - master
+    when: manual

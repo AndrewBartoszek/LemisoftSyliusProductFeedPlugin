@@ -1,0 +1,4 @@
+suites:
+    main:
+        namespace: Lemisoft\BoilerplatePlugin
+        psr4_prefix: Lemisoft\BoilerplatePlugin
