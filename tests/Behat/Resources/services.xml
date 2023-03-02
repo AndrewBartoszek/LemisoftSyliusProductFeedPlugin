@@ -5,20 +5,5 @@
     <services>
         <defaults public="true"/>
 
-        <service id="lemisoft_boilerplate.context.ui.shop.welcome"
-                 class="Lemisoft\Tests\BoilerplatePlugin\Behat\Context\Ui\Shop\WelcomeContext">
-            <argument type="service" id="lemisoft_boilerplate.page.shop.static_welcome"/>
-            <argument type="service" id="lemisoft_boilerplate.page.shop.dynamic_welcome"/>
-        </service>
-
-        <service id="lemisoft_boilerplate.page.shop.static_welcome"
-                 class="Lemisoft\Tests\BoilerplatePlugin\Behat\Page\Shop\StaticWelcomePage"
-                 parent="sylius.behat.symfony_page"
-                 public="false"/>
-
-        <service id="lemisoft_boilerplate.page.shop.dynamic_welcome"
-                 class="Lemisoft\Tests\BoilerplatePlugin\Behat\Page\Shop\DynamicWelcomePage"
-                 parent="sylius.behat.symfony_page"
-                 public="false"/>
     </services>
 </container>

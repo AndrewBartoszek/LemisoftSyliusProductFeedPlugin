@@ -1,5 +1,5 @@
 {
-    "name": "lemisoft/plugin-boilerplate",
+    "name": "lemisoft/sylius-product-feeds-plugin",
     "type": "sylius-plugin",
     "description": "Boilerplate plugin for Sylius.",
     "keywords": [
@@ -61,12 +61,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Lemisoft\\BoilerplatePlugin\\": "src/"
+            "Lemisoft\\SyliusProductFeedsPlugin\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Lemisoft\\Tests\\BoilerplatePlugin\\": "tests/"
+            "Lemisoft\\Tests\\SyliusProductFeedsPlugin\\": "tests/"
         },
         "classmap": [
             "tests/Application/Kernel.php"

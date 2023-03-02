@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Lemisoft\Tests\BoilerplatePlugin\Application\Kernel;
+use Lemisoft\Tests\SyliusProductFeedsPlugin\Application\Kernel;
 use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\HttpFoundation\Request;
 

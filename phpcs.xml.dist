@@ -21,7 +21,7 @@
     <!-- Skanowane katalogi !-->
     <file>bin/</file>
     <file>config/</file>
-    <file>public/</file>
+    
     <file>src/</file>
     <file>tests/</file>
 
@@ -200,8 +200,8 @@
     <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
         <properties>
             <property name="rootNamespaces" type="array">
-                <element key="src" value="Lemisoft\BoilerplatePlugin"/>
-                <element key="tests" value="Lemisoft\Tests\BoilerplatePlugin"/>
+                <element key="src" value="Lemisoft\SyliusProductFeedsPlugin"/>
+                <element key="tests" value="Lemisoft\Tests\SyliusProductFeedsPlugin"/>
             </property>
         </properties>
     </rule>
