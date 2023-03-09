@@ -7,6 +7,10 @@ parameters:
 
 doctrine:
     dbal:
+        types:
+            feed_type: Lemisoft\SyliusProductFeedsPlugin\Resources\config\doctrine\enum\FeedTypeEnumType
+            feed_state: Lemisoft\SyliusProductFeedsPlugin\Resources\config\doctrine\enum\FeedStateEnumType
+            product_name_mode: Lemisoft\SyliusProductFeedsPlugin\Resources\config\doctrine\enum\ProductNameModeType
         driver: 'pdo_mysql'
         server_version: '5.7'
         charset: UTF8

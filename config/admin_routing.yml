@@ -1,1 +1,50 @@
-# Define your own admin routes here
+lemisoft_sylius_product_feeds_admin_feed_admin:
+    resource: |
+        alias: lemisoft_sylius_product_feeds_plugin.product_feed
+        section: admin
+        templates: "@SyliusAdmin\\Crud"
+        redirect: update
+        grid: lemisoft_sylius_product_feeds_plugin_admin_product_feed
+        permission: true
+        vars:
+            all:
+                subheader: lemisoft_sylius_product_feeds_plugin.ui.manage_product_feeds
+                templates:
+                    form: "@LemisoftSyliusProductFeedsPlugin/Admin/ProductFeed/_form.html.twig"
+            index:
+                icon: magnify
+    type: sylius.resource
+
+lemisoft_sylius_product_feeds_admin_feed_admin_error:
+    resource: |
+        alias: lemisoft_sylius_product_feeds_plugin.product_feed_error
+        section: admin
+        templates: "@SyliusAdmin\\Crud"
+        redirect: update
+        grid: lemisoft_sylius_product_feeds_plugin_admin_product_feed_error
+        permission: true
+        vars:
+            all:
+                subheader: lemisoft_sylius_product_feeds_plugin.ui.manage_product_feeds
+            index:
+                icon: magnify
+    type: sylius.resource
+
+lemisoft_sylius_product_feeds_plugin_admin_product_feed_show:
+    path: /product-feeds/{id}
+    methods: [ GET ]
+    defaults:
+        _controller: lemisoft_sylius_product_feeds_plugin.controller.product_feed::showAction
+        _sylius:
+            section: admin
+            permission: true
+            template: "@LemisoftSyliusProductFeedsPlugin/Admin/ProductFeed/Crud/show.html.twig"
+
+lemisoft_sylius_product_feeds_plugin_admin_product_feed_generate:
+    path: /product-feeds/{id}/generate
+    methods: [ GET ]
+    defaults:
+        _controller: lemisoft.sylius_product_feeds_plugin.controller.admin.product_feed_controller::generateAction
+        _sylius:
+            section: admin
+            permission: true

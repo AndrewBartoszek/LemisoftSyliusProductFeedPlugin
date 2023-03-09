@@ -1,0 +1,41 @@
+lemisoft_sylius_product_feeds_plugin:
+    product_feed:
+        state:
+            error: Błąd
+            new: Nowy
+            ready: Gotowy
+        type:
+            ceneo: Ceneo
+            google: Google
+            facebook: Facebook
+        product_name_mode:
+            only_product_name: Nazwa tworzona z nazwy produktu
+            product_and_variant_name: Nazwa tworzona z nazwy produktu i variantu
+    form:
+        product_feed:
+            name: Nazwa
+            type: Rodzaj
+            state: Status
+            enabled: Aktywny
+            code: Kod
+            channel: Channel
+            shop_name: Nazwa sklepu
+            shop_description: Opis sklepu
+            is_https: Czy sklep używa protokolu https
+            product_name_mode: Sposób generowania nazwy produktu
+    ui:
+        product_feed: Źródło danych
+        product_feeds: Źródła danych
+        manage_product_feeds: Zarządzanie źródłem danych
+        new_product_feed: Dodawanie źródła danych
+        edit_product_feed: Edycja źródła danych
+        product_feed_errors: Błedy
+    admin:
+        menu:
+            product_feed: Źródła danych
+        product_feed:
+            title: Product feed
+            generate: Generuj
+
+
+

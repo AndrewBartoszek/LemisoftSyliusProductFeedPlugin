@@ -17,6 +17,78 @@ Dla php należy włączyć następujące rozszerzenia:
 5. Najlepiej używać plików konfiguracyjnych w formacie **.php**
 6. Publikacja wtyczki oraz używanie semantic version
 
+## Instalacja pluginu
+- Tworzymy plik:
+   ```bash
+   #src/Entity/ProductFeed/ProductFeed.php
+
+   declare(strict_types=1);
+
+   namespace App\Entity\ProductFeed;
+
+   use \Lemisoft\SyliusProductFeedsPlugin\Entity\ProductFeed\ProductFeed as BaseProductFeed;
+
+   class ProductFeed extends BaseProductFeed
+   {
+
+   }
+   ```
+
+- W pliku z repozytorium dla encji Product - zwykle plik src/Repository/ProductRepository.php użyć traita:
+   ```bash
+   #src/Repository/ProductRepository.php
+
+    declare(strict_types=1);
+
+    namespace Lemisoft\Tests\SyliusProductFeedsPlugin\Application\src\Doctrine\Orm;
+
+    use Lemisoft\SyliusProductFeedsPlugin\Repository\ProductRepositoryTrait;
+    use Sylius\Bundle\CoreBundle\Doctrine\ORM\ProductRepository as BaseProductRepository;
+
+    class ProductRepository extends BaseProductRepository
+    {
+        use ProductRepositoryTrait;
+    }
+   ```
+
+- Dodajemy doctrinowe typy:
+  ```bash
+  #config/packages/doctrine.yaml
+
+    doctrine:
+        dbal:
+            types:
+                feed_type: Lemisoft\SyliusProductFeedsPlugin\Resources\config\doctrine\enum\FeedTypeEnumType
+                feed_state: Lemisoft\SyliusProductFeedsPlugin\Resources\config\doctrine\enum\FeedStateEnumType
+                product_name_mode: Lemisoft\SyliusProductFeedsPlugin\Resources\config\doctrine\enum\ProductNameModeType
+  ```
+
+- Do .env dodać zmienną z rodzajami feed-ów, które mają być dostępne w aplikacji:
+   ```bash
+   #.env
+
+   PRODUCT_FEED_AVAILABLE='["ceneo", "facebook", "google"]'
+   ```
+- W pliku config/services.yaml dodać import:
+   ```bash
+   #config/services.yaml
+
+   imports:
+   - { resource: "@LemisoftSyliusProductFeedsPlugin/src/Resources/config/app/config.php" }
+   ```
+- W pliku config/routes.yaml dodać import:
+   ```bash
+   lemisoft_sylius_product_feeds_plugin_shop:
+       resource: "@LemisoftSyliusProductFeedsPlugin/config/shop_routing.yml"
+       prefix: /{_locale}
+       requirements:
+           _locale: ^[a-z]{2}(?:_[A-Z]{2})?$
+
+   lemisoft_sylius_product_feeds_plugin_admin:
+       resource: "@LemisoftSyliusProductFeedsPlugin/config/admin_routing.yml"
+       prefix: /admin
+   ```
+
 ## Uruchomienie wtyczki
 
 Wtyczka uruchamiana jest przy użyciu Docker.

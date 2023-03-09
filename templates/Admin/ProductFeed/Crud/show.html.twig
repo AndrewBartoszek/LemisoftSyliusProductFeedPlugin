@@ -1,0 +1,110 @@
+{# @var \Lemisoft\SyliusProductFeedsPlugin\Entity\ProductFeed\ProductFeedInterface feed #}
+
+{% extends '@SyliusAdmin/layout.html.twig' %}
+
+{% set feed = product_feed %}
+{% set channel = feed.channel %}
+
+{% block title %}{{ 'lemisoft_sylius_product_feeds_plugin.admin.product_feed.title'|trans ~' '~ feed.name }} {{ parent() }}{% endblock %}
+
+{% block content %}
+    {{ sonata_block_render_event('lemisoft_sylius_product_feeds_plugin.admin.product_feed.show.before_header', {'resource': resource}) }}
+
+    <div class="ui stackable two column grid">
+        <div class="ten wide column">
+            {% include '@LemisoftSyliusProductFeedsPlugin/Admin/ProductFeed/Crud/Show/_header.html.twig' %}
+        </div>
+
+        {% set menu = knp_menu_get('lemisoft.sylius_product_feeds_plugin.menu.product_feed_show_menu_builder', [], {'feed': feed}) %}
+        {{ knp_menu_render(menu, {'template': '@SyliusUi/Menu/top.html.twig'}) }}
+    </div>
+
+    {{ sonata_block_render_event('lemisoft_sylius_product_feeds_plugin.admin.product_feed.show.after_header', {'resource': resource}) }}
+
+    {% include '@LemisoftSyliusProductFeedsPlugin/Admin/ProductFeed/Crud/Show/_breadcrumb.html.twig' %}
+
+    {{ sonata_block_render_event('lemisoft_sylius_product_feeds_plugin.admin.product_feed.show.after_breadcrumb', {'resource': resource}) }}
+
+    {% if feed.state == constant('Lemisoft\\SyliusProductFeedsPlugin\\Model\\FeedStateType::READY') %}
+        <div class="ui segment spaceless">
+            <table class="ui basic celled table">
+                <thead>
+                <tr>
+                    <th>{{ 'sylius.ui.channel'|trans }}</th>
+                    <th>{{ 'sylius.ui.locale'|trans }}</th>
+                    <th>{{ 'Link'|trans }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr class="item">
+                        <td>{{ channel.name }}</td>
+                        <td>{{ channel.defaultLocale.name }}</td>
+                        <td>
+                            <div class="ui icon input" style="width: 100%;position: relative;">
+                                <div class="ui pointing below label teal"
+                                     style="position:absolute; right: 10px; top: -100%; display: none"
+                                     id="link-copied-1">
+                                    <i class="check icon"></i> {{ 'setono_sylius_feed.ui.link_copied'|trans }}
+                                </div>
+                                <input id="link-1" type="text"
+                                       value="{{ url('lemisoft_sylius_product_feeds_plugin_admin_product_feed_get_xml', {code: feed.code}) }}"
+                                       readonly>
+                                <i class="copy link icon" data-link-id="link-1"
+                                   data-link-copied-id="link-copied-1"
+                                   data-content="{{ 'Copy'|trans }}"
+                                   data-position="top right"></i>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="ui segment">
+            <div class="ui info message">
+                <div class="header">
+                    {{ 'Feed is not ready'|trans }}
+                </div>
+                <p>{{ 'The feed has either errored or hasn\'t been processed yet. Please press the generate button to trigger the processing'|trans }}</p>
+            </div>
+        </div>
+    {% endif %}
+    {% if feed.productFeedErrors|length > 0 %}
+        <h2 class="ui header">{{ 'Errors'|trans }}</h2>
+
+        <p>Found {{ feed.productFeedErrors|length }} errors</p>
+        <a href="{{ path('lemisoft_sylius_product_feeds_plugin_admin_product_feed_error_index', {id: feed.id}) }}">Error preview</a>
+    {% endif %}
+
+    {{ sonata_block_render_event('lemisoft_sylius_product_feeds_plugin.admin.product_feed.show.after_content', {'resource': resource}) }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $('[data-content]').popup();
+
+        let timers = {};
+
+        $('i.copy').on('click', function () {
+            const linkId = $(this).data('link-id');
+            const linkCopiedId = $(this).data('link-copied-id');
+
+            const link = $('#' + linkId).get(0);
+            const $linkCopied = $('#' + linkCopiedId);
+
+            link.select();
+            link.setSelectionRange(0, 9999);
+
+            document.execCommand('copy');
+
+            $linkCopied.show();
+
+            clearTimeout(timers[linkId]);
+            timers[linkId] = setTimeout(function () {
+                $linkCopied.hide();
+            }, 3000);
+        });
+    </script>
+{% endblock %}

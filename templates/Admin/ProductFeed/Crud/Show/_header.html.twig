@@ -1,0 +1,18 @@
+{# @var \Lemisoft\SyliusProductFeedsPlugin\Entity\ProductFeed\ProductFeedInterface feed #}
+
+<h1 class="ui header">
+    <i class="circular cart icon"></i>
+    <div class="content">
+        {{ 'lemisoft_sylius_product_feeds_plugin.ui.product_feeds'|trans }} {{ feed.name }}
+        <div class="sub header">
+            <div class="ui horizontal divided list">
+                <div class="item">
+                    {{ ('lemisoft_sylius_product_feeds_plugin.product_feed.type.' ~  feed.feedType.value) | trans }}
+                </div>
+                <div class="item">
+                    <div class="ui label">{{ ('lemisoft_sylius_product_feeds_plugin.product_feed.state.' ~ feed.state.value)|trans }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</h1>

@@ -1,0 +1,10 @@
+{% import '@SyliusAdmin/Macro/breadcrumb.html.twig' as breadcrumb %}
+
+{% set breadcrumbs = [
+    { label: 'sylius.ui.administration'|trans, url: path('sylius_admin_dashboard') },
+    { label: 'lemisoft_sylius_product_feeds_plugin.ui.product_feeds'|trans, url: path('lemisoft_sylius_product_feeds_plugin_admin_product_feed_index') },
+    { label: feed.name }
+]
+%}
+
+{{ breadcrumb.crumble(breadcrumbs) }}

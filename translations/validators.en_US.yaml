@@ -1,0 +1,5 @@
+lemisoft_sylius_product_feeds_plugin:
+    form:
+        product_feed:
+            inaccessible_type: Unavailable type
+            inaccessible_product_name_mode_type: Name generation type unavailable

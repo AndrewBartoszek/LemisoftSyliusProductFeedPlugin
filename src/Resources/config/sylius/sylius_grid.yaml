@@ -1,0 +1,86 @@
+sylius_grid:
+    templates:
+        action:
+#            create_seo_integration: "@LemisoftSyliusSeoIntegrationPlugin/Admin/SeoIntegration/Grid/Action/create.html.twig"
+    grids:
+        lemisoft_sylius_product_feeds_plugin_admin_product_feed:
+            driver:
+
+                name: doctrine/orm
+                options:
+                    class: "%lemisoft_sylius_product_feeds_plugin.model.product_feed.class%"
+                    repository:
+                        method: getAvailableProductFeeds
+                        arguments:
+                            - "expr:service('lemisoft.sylius_product_feeds_plugin.service.product_feed.available_product_feed_type_service').getAvailableProductFeeds()"
+            sorting:
+                name: asc
+            fields:
+                name:
+                    type: string
+                    label: lemisoft_sylius_product_feeds_plugin.form.product_feed.name
+                feedType:
+                    type: twig
+                    label: lemisoft_sylius_product_feeds_plugin.form.product_feed.type
+                    sortable: ~
+                    options:
+                        template: "@LemisoftSyliusProductFeedsPlugin/Admin/ProductFeed/Grid/Field/_feed_type.html.twig"
+                channelCode:
+                    type: twig
+                    label: lemisoft_sylius_product_feeds_plugin.form.product_feed.channel
+                    path: channel
+                    sortable: name
+                    options:
+                        template: "@SyliusAdmin/Channel/Grid/Field/name.html.twig"
+                code:
+                    type: string
+                    label: lemisoft_sylius_product_feeds_plugin.form.product_feed.code
+                enabled:
+                    type: twig
+                    label: lemisoft_sylius_product_feeds_plugin.form.product_feed.enabled
+                    sortable: ~
+                    options:
+                        template: "@LemisoftSyliusProductFeedsPlugin/Admin/ProductFeed/Grid/Field/_enabled.html.twig"
+            filters:
+                name:
+                    type: string
+                    label: lemisoft_sylius_product_feeds_plugin.form.product_feed.name
+                code:
+                    type: string
+                    label: lemisoft_sylius_product_feeds_plugin.form.product_feed.code
+            actions:
+                main:
+                    create:
+                        type: create
+                item:
+                    update:
+                        type: update
+                    show:
+                        type: show
+                    delete:
+                        type: delete
+                bulk:
+                    delete:
+                        type: delete
+
+        lemisoft_sylius_product_feeds_plugin_admin_product_feed_error:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: "%lemisoft_sylius_product_feeds_plugin.model.product_feed_error.class%"
+                    repository:
+                        method: getFeedErrors
+                        arguments:
+                            - "expr:service('request_stack').getCurrentRequest().get('id')"
+            sorting:
+                id: asc
+            fields:
+                id:
+                    type: string
+                    label: Id
+                message:
+                    type: string
+                    label: Message
+                data:
+                    type: string
+                    label: Data

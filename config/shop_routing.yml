@@ -1,0 +1,5 @@
+lemisoft_sylius_product_feeds_plugin_admin_product_feed_get_xml:
+    path: /product-feeds/{code}/xml
+    methods: [ GET ]
+    defaults:
+        _controller: lemisoft.sylius_product_feeds_plugin.controller.admin.product_feed_controller::getXmlAction

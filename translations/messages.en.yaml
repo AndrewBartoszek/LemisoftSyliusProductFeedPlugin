@@ -1,0 +1,38 @@
+lemisoft_sylius_product_feeds_plugin:
+    product_feed:
+        state:
+            error: Error
+            new: New
+            ready: Ready
+        type:
+            ceneo: Ceneo
+            google: Google
+            facebook: Facebook
+        product_name_mode:
+            only_product_name: The name is create from product name
+            product_and_variant_name: The name is create from product name and variant
+    form:
+        product_feed:
+            name: Name
+            type: Type
+            state: State
+            enabled: Enabled
+            code: Code
+            channel: Channel
+            shop_name: Shop name
+            shop_description: Shop description
+            is_https: Does the store use https
+            product_name_mode: How to generate the product name
+    ui:
+        product_feed: Product feed
+        product_feeds: Product feeds
+        manage_product_feeds: Manage product feeds
+        new_product_feed: Add product feed
+        edit_product_feed: Edit product feed
+        product_feed_errors: Product feed errors
+    admin:
+        menu:
+            product_feed: Product feeds
+        product_feed:
+            title: Product feed
+            generate: Generate

@@ -1,0 +1,15 @@
+sylius_resource:
+    resources:
+        lemisoft_sylius_product_feeds_plugin.product_feed:
+            driver: doctrine/orm
+            classes:
+                model: Lemisoft\SyliusProductFeedsPlugin\Entity\ProductFeed\ProductFeed
+                form: Lemisoft\SyliusProductFeedsPlugin\Form\ProductFeed\ProductFeedType
+                repository: Lemisoft\SyliusProductFeedsPlugin\Repository\ProductFeedRepository
+
+        lemisoft_sylius_product_feeds_plugin.product_feed_error:
+            driver: doctrine/orm
+            classes:
+                model: Lemisoft\SyliusProductFeedsPlugin\Entity\ProductFeed\ProductFeedError
+                repository: Lemisoft\SyliusProductFeedsPlugin\Repository\ProductFeedErrorRepository
+
