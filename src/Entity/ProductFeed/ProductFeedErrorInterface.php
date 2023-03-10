@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Lemisoft\SyliusProductFeedsPlugin\Entity\ProductFeed;
 
 interface ProductFeedErrorInterface
@@ -14,7 +16,7 @@ interface ProductFeedErrorInterface
 
     public function setData(?string $data): void;
 
-    public function getProductFeed(): ?ProductFeed;
+    public function getProductFeed(): ?ProductFeedInterface;
 
-    public function setProductFeed(?ProductFeed $productFeed): void;
+    public function setProductFeed(?ProductFeedInterface $productFeed): void;
 }

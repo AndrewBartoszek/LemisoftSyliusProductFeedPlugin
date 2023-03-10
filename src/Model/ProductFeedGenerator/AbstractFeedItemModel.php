@@ -11,8 +11,8 @@ use Sylius\Component\Core\Model\ProductVariantInterface;
 
 class AbstractFeedItemModel
 {
-    const EMPTY_LENGTH = 0;
-    const DESCRIPTION_LENGTH = 5000;
+    public const EMPTY_LENGTH = 0;
+    public const DESCRIPTION_LENGTH = 5000;
 
     protected function getName(
         ProductInterface $product,
@@ -46,11 +46,7 @@ class AbstractFeedItemModel
 
     protected function getDescription(ProductInterface $product, ProductVariantInterface $variant): ?string
     {
-        if (null !== $product->getDescription()) {
-            $description = $product->getDescription();
-        } else {
-            $description = $product->getShortDescription();
-        }
+        $description = null !== $product->getDescription() ? $product->getDescription() : $product->getShortDescription();
 
         return null !== $description ? $this->cutDescription($description) : null;
     }

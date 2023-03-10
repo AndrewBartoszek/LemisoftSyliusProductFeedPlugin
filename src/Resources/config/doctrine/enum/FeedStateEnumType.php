@@ -26,8 +26,10 @@ final class FeedStateEnumType extends AbstractEnumType
         return FeedStateType::NEW;
     }
 
-    public static function getEnumsClass(): string
+    public function convertToPHPValue($value, AbstractPlatform $platform)
     {
-        return FeedStateType::class;
+        $value = $this->checkEnumValue($value);
+
+        return FeedStateType::tryFrom($value);
     }
 }

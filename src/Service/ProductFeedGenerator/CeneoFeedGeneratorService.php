@@ -10,32 +10,31 @@ use JMS\Serializer\SerializerInterface;
 use Lemisoft\SyliusProductFeedsPlugin\Model\ProductFeedGenerator\CeneoFeedItemModel;
 use Lemisoft\SyliusProductFeedsPlugin\Model\ProductFeedGenerator\CeneoFeedXmlModel;
 use Lemisoft\SyliusProductFeedsPlugin\Model\ProductFeedGenerator\FeedItemModelInterface;
+use Lemisoft\SyliusProductFeedsPlugin\Repository\ProductRepositoryInterface;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Sylius\Component\Core\Calculator\ProductVariantPricesCalculatorInterface;
-use Sylius\Component\Core\Model\Product;
-use Sylius\Component\Core\Model\ProductVariant;
+use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\ProductVariantInterface;
-use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class CeneoFeedGeneratorService extends AbstractBaseFeedGenerator
 {
     public function __construct(
-        protected RepositoryInterface $productRepository,
+        protected ProductRepositoryInterface $productRepository,
         protected EntityManagerInterface $em,
         protected SerializerInterface $serializer,
         protected UrlGeneratorInterface $urlGenerator,
         protected ProductVariantPricesCalculatorInterface $productVariantPricesCalculator,
         protected CacheManager $imagineCacheManager,
         protected ValidatorInterface $validator,
-        protected string $projectDir
+        protected string $projectDir,
     ) {
     }
 
     public function generate(): void
     {
-        try{
+        try {
             $this->clearErrors();
             $items = $this->prepareItems();
 
@@ -45,7 +44,7 @@ final class CeneoFeedGeneratorService extends AbstractBaseFeedGenerator
 
             $this->saveXmlFile($xml);
             $status = true;
-        } catch(Exception $e){
+        } catch (Exception $e) {
             $status = false;
         }
 
@@ -55,38 +54,45 @@ final class CeneoFeedGeneratorService extends AbstractBaseFeedGenerator
     /**
      * @return FeedItemModelInterface[]
      */
-    protected function processProduct(Product $product): array
+    protected function processProduct(ProductInterface $product): array
     {
         $items = [];
-        /** @var ProductVariant $variant */
+        /** @var ProductVariantInterface $variant */
         foreach ($product->getVariants() as $variant) {
             //jezeli śledzony i nie ma go na stanie to pomijamy
             if ($variant->isTracked() && !$variant->isInStock()) {
                 continue;
             }
 
-            $model = (new CeneoFeedItemModel())->fromVariant($variant, $this->getProductFeed());
-            $model->setProductLink($this->prepareLink($product));
-            $model->setPrice($this->getPrice($variant));
-
-            $this->setImagesUrls($product, $variant, $model);
-
-            $errors = $this->validate($model);
-            if (null !== $errors) {
-                $this->saveErrors($errors, $model);
-            }
-
-            $items[] = $model;
+            $items[] = $this->processVariant($product, $variant);
         }
 
         return $items;
     }
 
+    protected function processVariant(
+        ProductInterface $product,
+        ProductVariantInterface $variant,
+    ): FeedItemModelInterface {
+        $model = (new CeneoFeedItemModel())->fromVariant($variant, $this->getProductFeed());
+        $model->setProductLink($this->prepareLink($product));
+        $model->setPrice($this->getPrice($variant));
+
+        $this->setImagesUrls($product, $variant, $model);
+
+        $errors = $this->validate($model);
+        if (null !== $errors) {
+            $this->saveErrors($errors, $model);
+        }
+
+        return $model;
+    }
+
     protected function getPrice(ProductVariantInterface $variant): ?string
     {
         $price = $this->productVariantPricesCalculator->calculate($variant, ['channel' => $this->getChannel()]);
-        $penny = sprintf("%02d", $price % 100);
-        $total = (int)($price / 100);
+        $penny = sprintf("%02d", $price % self::PENNY_VALUE);
+        $total = (int)($price / self::PENNY_VALUE);
 
         $currencyCode = $this->getChannel()->getBaseCurrency()?->getCode();
 

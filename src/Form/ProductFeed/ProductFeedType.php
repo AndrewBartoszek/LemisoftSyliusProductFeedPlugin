@@ -9,7 +9,6 @@ use Lemisoft\SyliusProductFeedsPlugin\Entity\ProductFeed\ProductFeedInterface;
 use Lemisoft\SyliusProductFeedsPlugin\Model\FeedType;
 use Lemisoft\SyliusProductFeedsPlugin\Model\ProductNameModeType;
 use Lemisoft\SyliusProductFeedsPlugin\Service\ProductFeed\AvailableProductFeedTypeService;
-use Ramsey\Uuid\Uuid;
 use Sylius\Bundle\ChannelBundle\Form\Type\ChannelChoiceType;
 use Sylius\Bundle\ResourceBundle\Form\Type\AbstractResourceType;
 use Symfony\Component\Form\CallbackTransformer;
@@ -18,8 +17,6 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -47,6 +44,7 @@ final class ProductFeedType extends AbstractResourceType
         /** @var ProductFeedInterface $object */
         $object = $options['data'];
         $oldType = $object->getFeedType();
+
         $oldChannel = $object->getChannel();
 
         $builder
@@ -79,7 +77,7 @@ final class ProductFeedType extends AbstractResourceType
                     new NotBlank(),
                     new Callback([$this, 'validateFeedType']),
                 ],
-                'attr'        => ['disabled' => (null !== $object->getId())],
+                'attr'        => ['disabled' => null !== $object->getId()],
             ])
             ->add('productNameMode', ChoiceType::class, [
                 'choices'     => ProductNameModeType::getAvailableToFormSelect(),
@@ -110,29 +108,9 @@ final class ProductFeedType extends AbstractResourceType
                 'constraints' => [
                     new NotBlank(),
                 ],
-                'attr'        => ['disabled' => (null !== $object->getId())],
+                'attr'        => ['disabled' => null !== $object->getId()],
             ])
-            ->addEventListener(
-                FormEvents::PRE_SUBMIT,
-                static function (FormEvent $event) use ($oldType, $oldChannel): void {
-                    $form = $event->getForm();
-                    /** @var ProductFeedInterface $entity */
-                    $entity = $form->getData();
-                    /** @var array $eventData */
-                    $eventData = $event->getData();
-
-                    if (null === $entity->getId()) {
-                        $entity->setCode(Uuid::uuid4()->toString());
-                    } else {
-                        //przy edycji nie pozwalamy na zmiane typu i kanalu
-                        $eventData['feedType'] = $oldType?->value;
-                        $eventData['channel'] = $oldChannel?->getCode();
-                    }
-
-                    $form->setData($entity);
-                    $event->setData($eventData);
-                }
-            );
+            ->addEventSubscriber(new ProductFeedTypeEventSubscriber($oldType, $oldChannel));
 
         $builder
             ->get('feedType')

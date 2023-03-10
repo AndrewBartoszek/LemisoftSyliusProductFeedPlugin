@@ -6,16 +6,20 @@ namespace Lemisoft\SyliusProductFeedsPlugin\Service\ProductFeed;
 
 use Lemisoft\SyliusProductFeedsPlugin\Entity\ProductFeed\ProductFeedInterface;
 use Lemisoft\SyliusProductFeedsPlugin\Model\FeedType;
+use Lemisoft\SyliusProductFeedsPlugin\Repository\ProductFeedRepository;
 use Lemisoft\SyliusProductFeedsPlugin\Service\ProductFeedGenerator\ProductFeedGeneratorFactory;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Symfony\Component\HttpFoundation\File\File;
 
 final class ProductFeedService
 {
+    /**
+     * @param ProductFeedRepository $repository
+     */
     public function __construct(
         protected RepositoryInterface $repository,
         protected AvailableProductFeedTypeService $availableProductFeedTypeService,
-        protected ProductFeedGeneratorFactory $productFeedGeneratorFactory
+        protected ProductFeedGeneratorFactory $productFeedGeneratorFactory,
     ) {
     }
 
@@ -35,7 +39,7 @@ final class ProductFeedService
         );
     }
 
-    public function generate(ProductFeedInterface $productFeed)
+    public function generate(ProductFeedInterface $productFeed): void
     {
         $generator = $this->productFeedGeneratorFactory->getGenerator($productFeed);
         $generator->generate();
@@ -44,7 +48,7 @@ final class ProductFeedService
     /**
      * @return FeedType[]
      */
-    public function getAvailableProductFeeds():array
+    public function getAvailableProductFeeds(): array
     {
         return $this->availableProductFeedTypeService->getAvailableProductFeeds();
     }

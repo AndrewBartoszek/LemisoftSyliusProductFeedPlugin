@@ -11,8 +11,6 @@ use LogicException;
 
 abstract class AbstractEnumType extends Type
 {
-    abstract public static function getEnumsClass(): string;
-
     public function getSQLDeclaration(array $column, AbstractPlatform $platform)
     {
         return 'TEXT';
@@ -27,12 +25,12 @@ abstract class AbstractEnumType extends Type
         return null;
     }
 
-    public function convertToPHPValue($value, AbstractPlatform $platform)
+    public function checkEnumValue(mixed $value): string
     {
-        if (false === enum_exists($this->getEnumsClass(), true)) {
-            throw new LogicException("This class should be an enum");
+        if (!is_string($value)) {
+            throw new LogicException("Wartość enuma musi być stringiem");
         }
 
-        return $this::getEnumsClass()::tryFrom($value);
+        return $value;
     }
 }

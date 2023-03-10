@@ -42,10 +42,11 @@ Dla php należy włączyć następujące rozszerzenia:
 
     namespace Lemisoft\Tests\SyliusProductFeedsPlugin\Application\src\Doctrine\Orm;
 
+    use Lemisoft\SyliusProductFeedsPlugin\Repository\ProductRepositoryInterface;
     use Lemisoft\SyliusProductFeedsPlugin\Repository\ProductRepositoryTrait;
     use Sylius\Bundle\CoreBundle\Doctrine\ORM\ProductRepository as BaseProductRepository;
 
-    class ProductRepository extends BaseProductRepository
+    class ProductRepository extends BaseProductRepository  implements ProductRepositoryInterface
     {
         use ProductRepositoryTrait;
     }

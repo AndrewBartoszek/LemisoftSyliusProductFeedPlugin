@@ -11,14 +11,13 @@ use Lemisoft\SyliusProductFeedsPlugin\Entity\ProductFeed\ProductFeedError;
 use Lemisoft\SyliusProductFeedsPlugin\Entity\ProductFeed\ProductFeedInterface;
 use Lemisoft\SyliusProductFeedsPlugin\Model\FeedStateType;
 use Lemisoft\SyliusProductFeedsPlugin\Model\ProductFeedGenerator\FeedItemModelInterface;
+use Lemisoft\SyliusProductFeedsPlugin\Repository\ProductRepositoryInterface;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Sylius\Component\Core\Calculator\ProductVariantPricesCalculatorInterface;
 use Sylius\Component\Core\Model\ChannelInterface;
-use Sylius\Component\Core\Model\Product;
 use Sylius\Component\Core\Model\ProductImage;
 use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\ProductVariantInterface;
-use Sylius\Component\Resource\Repository\RepositoryInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -27,18 +26,19 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 abstract class AbstractBaseFeedGenerator implements BaseFeedGeneratorInterface
 {
-    const HTTPS_PROTOCOL = 'https';
-    const HTTP_PROTOCOL = 'http';
-    const PRODUCT_DETAIL_SHOP_ROUTE = 'sylius_shop_product_show';
-    const DEFAULT_IMAGINE_FILTER = 'sylius_shop_product_original';
-    const FEED_DIR = 'etc' . DIRECTORY_SEPARATOR . 'feed';
-
-    const WEB_URL_SEPARATOR = '/';
+    protected const HTTPS_PROTOCOL = 'https';
+    protected const HTTP_PROTOCOL = 'http';
+    protected const PRODUCT_DETAIL_SHOP_ROUTE = 'sylius_shop_product_show';
+    protected const DEFAULT_IMAGINE_FILTER = 'sylius_shop_product_original';
+    protected const FEED_DIR = 'etc' . DIRECTORY_SEPARATOR . 'feed';
+    protected const PENNY_VALUE = 100;
+    protected const WEB_URL_SEPARATOR = '/';
+    protected const ZERO_INT = 0;
 
     protected ?ProductFeedInterface $productFeed = null;
     protected ?ChannelInterface $channel = null;
 
-    protected RepositoryInterface $productRepository;
+    protected ProductRepositoryInterface $productRepository;
     protected EntityManagerInterface $em;
     protected SerializerInterface $serializer;
     protected UrlGeneratorInterface $urlGenerator;
@@ -57,6 +57,7 @@ abstract class AbstractBaseFeedGenerator implements BaseFeedGeneratorInterface
 
     /**
      * @return FeedItemModelInterface[]
+     *
      * @throws Exception
      */
     public function prepareItems(): array
@@ -73,11 +74,20 @@ abstract class AbstractBaseFeedGenerator implements BaseFeedGeneratorInterface
 
     protected function getFilePath(): string
     {
-        return $this->projectDir . DIRECTORY_SEPARATOR . self::FEED_DIR . DIRECTORY_SEPARATOR .
-            $this->getProductFeed()->getCode() . '.xml';
+        $productFeedCode = $this->getProductFeed()->getCode();
+        if (null === $productFeedCode) {
+            throw new Exception('Niepoprawnie utworzony feed. Feed musi posiadać kod');
+        }
+
+        return $this->projectDir . DIRECTORY_SEPARATOR . self::FEED_DIR . DIRECTORY_SEPARATOR . $productFeedCode . '.xml';
     }
 
-    protected function saveXmlFile(string $xml)
+    /**
+     * @return FeedItemModelInterface[]
+     */
+    abstract protected function processProduct(ProductInterface $product): array;
+
+    protected function saveXmlFile(string $xml): void
     {
         file_put_contents(
             $this->getFilePath(),
@@ -86,7 +96,7 @@ abstract class AbstractBaseFeedGenerator implements BaseFeedGeneratorInterface
     }
 
     /**
-     * @return Product[]
+     * @return ProductInterface[]
      */
     protected function getData(): array
     {
@@ -109,7 +119,7 @@ abstract class AbstractBaseFeedGenerator implements BaseFeedGeneratorInterface
     }
 
     /**
-     * @param Product[] $products
+     * @param ProductInterface[] $products
      *
      * @return FeedItemModelInterface[]
      */
@@ -124,7 +134,7 @@ abstract class AbstractBaseFeedGenerator implements BaseFeedGeneratorInterface
         return $result;
     }
 
-    protected function prepareLink(Product $product): ?string
+    protected function prepareLink(ProductInterface $product): ?string
     {
         $domainUrl = $this->getDomainUrl();
         if (null === $domainUrl) {
@@ -135,9 +145,9 @@ abstract class AbstractBaseFeedGenerator implements BaseFeedGeneratorInterface
             $this->urlGenerator->generate(
                 self::PRODUCT_DETAIL_SHOP_ROUTE,
                 [
-                    'slug' => $product->getSlug(),
+                    'slug'    => $product->getSlug(),
                     '_locale' => $this->getChannel()->getDefaultLocale()?->getCode(),
-                ]
+                ],
             );
     }
 
@@ -158,7 +168,7 @@ abstract class AbstractBaseFeedGenerator implements BaseFeedGeneratorInterface
         ProductInterface $product,
         ProductVariantInterface $variant,
         FeedItemModelInterface $model,
-    ) {
+    ): void {
 
         $urls = $this->getImagesUrls($product, $variant);
         if (isset($urls[0])) {
@@ -179,13 +189,16 @@ abstract class AbstractBaseFeedGenerator implements BaseFeedGeneratorInterface
         $imageUrls = $this->getImages($product);
 
         $images = [];
-        foreach ($imageUrls as $k => $imageUrl) {
+        foreach ($imageUrls as $imageUrl) {
             $images[] = $imageUrl;
         }
 
         return $images;
     }
 
+    /**
+     * @return string[]
+     */
     protected function getImages(ProductInterface $product): array
     {
         $urls = [];
@@ -228,11 +241,16 @@ abstract class AbstractBaseFeedGenerator implements BaseFeedGeneratorInterface
         $this->em->flush();
     }
 
-    protected function validate($model, $validationGroups = []): ?ConstraintViolationListInterface
-    {
+    /**
+     * @param string[] $validationGroups
+     */
+    protected function validate(
+        FeedItemModelInterface $model,
+        array $validationGroups = [],
+    ): ?ConstraintViolationListInterface {
         $errors = $this->validator->validate($model, null, $validationGroups);
 
-        if (count($errors)) {
+        if (self::ZERO_INT < count($errors)) {
             return $errors;
         }
 
@@ -241,11 +259,14 @@ abstract class AbstractBaseFeedGenerator implements BaseFeedGeneratorInterface
 
     protected function clearErrors(): void
     {
-        foreach ($this->getProductFeed()->getProductFeedErrors() as $error) {
+        /** @var ProductFeedError[] $errors */
+        $errors = $this->getProductFeed()->getProductFeedErrors();
+
+        foreach ($errors as $error) {
             $this->em->remove($error);
         }
-        $this->em->flush();
 
+        $this->em->flush();
     }
 
     protected function saveErrors(ConstraintViolationListInterface $errors, FeedItemModelInterface $model): void

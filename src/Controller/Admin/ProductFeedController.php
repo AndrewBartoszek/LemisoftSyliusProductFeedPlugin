@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * @psalm-suppress PropertyNotSetInConstructor
+ */
 final class ProductFeedController extends AbstractController
 {
     public function __construct(protected ProductFeedService $productFeedService)

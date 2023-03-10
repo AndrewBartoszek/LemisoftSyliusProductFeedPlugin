@@ -17,7 +17,7 @@ class FacebookFeedXmlModel
     public FacebookFeedXmlChannelModel $channel;
 
     /**
-     * @param FacebookFeedItemModel[] $items
+     * @param FeedItemModelInterface[] $items
      */
     public function __construct(array $items, ProductFeedInterface $productFeed)
     {

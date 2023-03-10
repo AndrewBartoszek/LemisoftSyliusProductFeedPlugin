@@ -26,8 +26,10 @@ class ProductNameModeType extends AbstractEnumType
         return ProdNameModeType::ONLY_PRODUCT_NAME;
     }
 
-    public static function getEnumsClass(): string
+    public function convertToPHPValue($value, AbstractPlatform $platform)
     {
-        return ProdNameModeType::class;
+        $value = $this->checkEnumValue($value);
+
+        return ProdNameModeType::tryFrom($value);
     }
 }

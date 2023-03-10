@@ -12,10 +12,8 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 
 final class ProductFeedShowMenuBuilder
 {
-    public function __construct(
-        private FactoryInterface $factory,
-        private EventDispatcherInterface $eventDispatcher
-    ) {
+    public function __construct(private FactoryInterface $factory, private EventDispatcherInterface $eventDispatcher)
+    {
     }
 
     public function createMenu(array $options): ItemInterface

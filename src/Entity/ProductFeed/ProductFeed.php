@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lemisoft\SyliusProductFeedsPlugin\Entity\ProductFeed;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\GeneratedValue;
@@ -116,14 +117,14 @@ class ProductFeed implements ResourceInterface, ProductFeedInterface
     private ?Channel $channel = null;
 
     /**
-     * @var ArrayCollection<int, ProductFeedError>
+     * @var Collection<int, ProductFeedError>
      */
     #[ORM\OneToMany(
         mappedBy: "productFeed",
         targetEntity: ProductFeedError::class,
         cascade: ["persist", "remove"],
     )]
-    private ArrayCollection $productFeedErrors;
+    private Collection $productFeedErrors;
 
     public function __construct()
     {
@@ -196,9 +197,9 @@ class ProductFeed implements ResourceInterface, ProductFeedInterface
     }
 
     /**
-     * @return ArrayCollection<int, ProductFeedError>
+     * @return Collection<int, ProductFeedError>
      */
-    public function getProductFeedErrors(): ArrayCollection
+    public function getProductFeedErrors(): Collection
     {
         return $this->productFeedErrors;
     }

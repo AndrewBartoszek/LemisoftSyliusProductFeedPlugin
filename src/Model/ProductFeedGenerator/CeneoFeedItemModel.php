@@ -54,7 +54,9 @@ class CeneoFeedItemModel extends AbstractFeedItemModel implements FeedItemModelI
         /** @var ProductInterface $product */
         $product = $variant->getProduct();
 
-        $this->id = $variant->getId();
+        /** @var int|null $id */
+        $id = $variant->getId();
+        $this->id = $id;
         $this->stock = $this->getStockCount($variant);
         $this->name = $this->getName($product, $variant, $productFeed);
         $this->desc = $this->getDescription($product, $variant);

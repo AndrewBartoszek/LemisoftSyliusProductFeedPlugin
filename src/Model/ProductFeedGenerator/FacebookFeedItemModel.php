@@ -17,10 +17,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[Serializer\XmlRoot("item")]
 final class FacebookFeedItemModel extends AbstractFeedItemModel implements FeedItemModelInterface
 {
-    const EMPTY_LENGTH = 0;
-    const ONE_LENGTH = 1;
-    const DESCRIPTION_LENGTH = 5000;
-    const TITLE_MAX_LENGTH = 150;
+    public const EMPTY_LENGTH = 0;
+    public const ONE_LENGTH = 1;
+    public const DESCRIPTION_LENGTH = 5000;
+    public const TITLE_MAX_LENGTH = 150;
 
     #[Serializer\Type("integer")]
     #[Serializer\XmlElement(cdata: false, namespace: FeedXmlNamespaceType::FACEBOOK->value)]
@@ -81,19 +81,23 @@ final class FacebookFeedItemModel extends AbstractFeedItemModel implements FeedI
      * @var string[]
      */
     #[Serializer\Type("array")]
-    #[Serializer\XmlList(entry: "additional_image_link", inline: true, namespace: FeedXmlNamespaceType::FACEBOOK->value,)]
+    #[Serializer\XmlList(entry: "additional_image_link", inline: true, namespace: FeedXmlNamespaceType::FACEBOOK->value)]
     #[Serializer\XmlElement(cdata: false)]
     public array $additional_image_link = [];
 
     public function fromVariant(
         ProductVariantInterface $variant,
-        ProductFeedInterface $productFeed
+        ProductFeedInterface $productFeed,
     ): FacebookFeedItemModel {
         /** @var Product $product */
         $product = $variant->getProduct();
+        /** @var int|null $productId */
+        $productId = $product->getId();
 
-        $this->id = $variant->getId();
-        $this->item_group_id = count($product->getVariants()) > self::ONE_LENGTH ? $product->getId() : null;
+        /** @var int|null $id */
+        $id = $variant->getId();
+        $this->id = $id;
+        $this->item_group_id = count($product->getVariants()) > self::ONE_LENGTH ? $productId : null;
         $this->title = $this->getName($product, $variant, $productFeed);
         /** //$this->gtin = $variant->getEan(); */
         $this->gtin = null;
@@ -120,14 +124,14 @@ final class FacebookFeedItemModel extends AbstractFeedItemModel implements FeedI
         $this->price = $price;
     }
 
-    public function setImage(?string $image): void
+    public function setImage(?string $url): void
     {
-        $this->image = $image;
+        $this->image = $url;
     }
 
     protected function getAvailability(Product $product, ProductVariantInterface $variant): string
     {
         return !$variant->isTracked() || $variant->isInStock() ?
-            FacebookAvailabilityType::IN_STOCK : FacebookAvailabilityType::OUT_OF_STOCK;
+            FacebookAvailabilityType::IN_STOCK->value : FacebookAvailabilityType::OUT_OF_STOCK->value;
     }
 }

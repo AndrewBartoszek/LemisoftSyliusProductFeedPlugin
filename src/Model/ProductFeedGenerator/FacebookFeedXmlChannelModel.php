@@ -24,14 +24,14 @@ class FacebookFeedXmlChannelModel
     public ?string $description = null;
 
     /**
-     * @var FacebookFeedItemModel[]
+     * @var FeedItemModelInterface[]
      */
     #[Serializer\Type("array<Lemisoft\SyliusProductFeedsPlugin\Model\ProductFeedGenerator\FacebookFeedItemModel>")]
     #[Serializer\XmlList(entry: "item", inline: true)]
     public array $item = [];
 
     /**
-     * @param FacebookFeedItemModel[] $items
+     * @param FeedItemModelInterface[] $items
      */
     public function __construct(array $items, ProductFeedInterface $productFeed)
     {

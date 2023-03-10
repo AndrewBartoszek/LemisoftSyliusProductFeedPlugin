@@ -10,14 +10,17 @@ use Lemisoft\SyliusProductFeedsPlugin\Model\FeedXmlPrefixType;
 
 #[Serializer\XmlRoot("offers")]
 #[Serializer\XmlNamespace(uri: FeedXmlNamespaceType::CENEO->value, prefix: FeedXmlPrefixType::XSI->value)]
-class CeneoFeedXmlModel
+final class CeneoFeedXmlModel
 {
+    /**
+     * @var FeedItemModelInterface[]
+     */
     #[Serializer\Type("array<Lemisoft\SyliusProductFeedsPlugin\Model\ProductFeedGenerator\CeneoFeedItemModel>")]
     #[Serializer\XmlList(entry: "o", inline: true)]
     public array $item = [];
 
     /**
-     * @param CeneoFeedItemModel[] $items
+     * @param FeedItemModelInterface[] $items
      */
     public function __construct(array $items)
     {

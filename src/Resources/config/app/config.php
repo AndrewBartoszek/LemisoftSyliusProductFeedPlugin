@@ -50,7 +50,7 @@ return static function (ContainerConfigurator $containerConfigurator) {
             MenuBuilderListener::class,
         )
         ->args(
-            [service('lemisoft.sylius_product_feeds_plugin.service.product_feed.available_product_feed_type_service')]
+            [service('lemisoft.sylius_product_feeds_plugin.service.product_feed.available_product_feed_type_service')],
         )
         ->tag('kernel.event_listener', ['event' => 'sylius.menu.admin.main', 'method' => 'addAdminMenuItems']);
 

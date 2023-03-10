@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lemisoft\SyliusProductFeedsPlugin\Resources\config\doctrine\enum;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Lemisoft\SyliusProductFeedsPlugin\Model\FeedType;
 
 final class FeedTypeEnumType extends AbstractEnumType
@@ -15,8 +16,10 @@ final class FeedTypeEnumType extends AbstractEnumType
         return self::NAME;
     }
 
-    public static function getEnumsClass(): string
+    public function convertToPHPValue($value, AbstractPlatform $platform)
     {
-        return FeedType::class;
+        $value = $this->checkEnumValue($value);
+
+        return FeedType::tryFrom($value);
     }
 }

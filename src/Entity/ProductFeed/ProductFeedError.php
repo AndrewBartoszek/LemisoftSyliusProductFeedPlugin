@@ -41,7 +41,7 @@ class ProductFeedError implements ResourceInterface, ProductFeedErrorInterface
         targetEntity: ProductFeed::class,
         cascade: ["persist"],
     )]
-    private ?ProductFeed $productFeed = null;
+    private ?ProductFeedInterface $productFeed = null;
 
     public function getId(): ?int
     {
@@ -68,12 +68,12 @@ class ProductFeedError implements ResourceInterface, ProductFeedErrorInterface
         $this->data = $data;
     }
 
-    public function getProductFeed(): ?ProductFeed
+    public function getProductFeed(): ?ProductFeedInterface
     {
         return $this->productFeed;
     }
 
-    public function setProductFeed(?ProductFeed $productFeed): void
+    public function setProductFeed(?ProductFeedInterface $productFeed): void
     {
         $this->productFeed = $productFeed;
     }

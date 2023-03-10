@@ -6,7 +6,6 @@ namespace Lemisoft\SyliusProductFeedsPlugin\Service\ProductFeedGenerator;
 
 use Lemisoft\SyliusProductFeedsPlugin\Entity\ProductFeed\ProductFeedInterface;
 use Lemisoft\SyliusProductFeedsPlugin\Model\FeedType;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 final class ProductFeedGeneratorFactory
 {

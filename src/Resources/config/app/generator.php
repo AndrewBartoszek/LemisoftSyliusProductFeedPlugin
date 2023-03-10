@@ -22,7 +22,7 @@ return static function (ContainerConfigurator $containerConfigurator) {
             ProductFeedGeneratorFactory::class,
         )->args([
             service(
-                'lemisoft.sylius_product_feeds_plugin.service.product_feed_generator.ceneo_feed_generator_service'
+                'lemisoft.sylius_product_feeds_plugin.service.product_feed_generator.ceneo_feed_generator_service',
             ),
             service(
                 'lemisoft.sylius_product_feeds_plugin.service.product_feed_generator.facebook_feed_generator_service',
