@@ -228,6 +228,17 @@ abstract class AbstractBaseFeedGenerator implements BaseFeedGeneratorInterface
         return $urls;
     }
 
+    protected function getGoogleTypePrice(ProductVariantInterface $variant): ?string
+    {
+        $price = $this->productVariantPricesCalculator->calculate($variant, ['channel' => $this->getChannel()]);
+        $penny = sprintf("%02d", $price % self::PENNY_VALUE);
+        $total = (int)($price / self::PENNY_VALUE);
+
+        $currencyCode = $this->getChannel()->getBaseCurrency()?->getCode();
+
+        return null === $currencyCode ? null : $total . '.' . $penny . ' ' . $currencyCode;
+    }
+
     protected function saveFeedGenerationStatus(bool $status): void
     {
         $productFeed = $this->getProductFeed();

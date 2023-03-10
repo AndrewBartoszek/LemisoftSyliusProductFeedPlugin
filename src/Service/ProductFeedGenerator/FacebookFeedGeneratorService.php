@@ -7,7 +7,7 @@ namespace Lemisoft\SyliusProductFeedsPlugin\Service\ProductFeedGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use JMS\Serializer\SerializerInterface;
-use Lemisoft\SyliusProductFeedsPlugin\Model\ProductFeedGenerator\FacebookFeedItemModel;
+use Lemisoft\SyliusProductFeedsPlugin\Model\ProductFeedGenerator\FacebookFeedItemModelAbstract;
 use Lemisoft\SyliusProductFeedsPlugin\Model\ProductFeedGenerator\FacebookFeedXmlModel;
 use Lemisoft\SyliusProductFeedsPlugin\Model\ProductFeedGenerator\FeedItemModelInterface;
 use Lemisoft\SyliusProductFeedsPlugin\Repository\ProductRepositoryInterface;
@@ -79,9 +79,9 @@ final class FacebookFeedGeneratorService extends AbstractBaseFeedGenerator
         ProductInterface $product,
         ProductVariantInterface $variant,
     ): FeedItemModelInterface {
-        $model = (new FacebookFeedItemModel())->fromVariant($variant, $this->getProductFeed());
+        $model = (new FacebookFeedItemModelAbstract())->fromVariant($variant, $this->getProductFeed());
         $model->setProductLink($this->prepareLink($product));
-        $model->setPrice($this->getPrice($variant));
+        $model->setPrice($this->getGoogleTypePrice($variant));
         $this->setImagesUrls($product, $variant, $model);
 
         $errors = $this->validate($model);
@@ -90,16 +90,5 @@ final class FacebookFeedGeneratorService extends AbstractBaseFeedGenerator
         }
 
         return $model;
-    }
-
-    protected function getPrice(ProductVariantInterface $variant): ?string
-    {
-        $price = $this->productVariantPricesCalculator->calculate($variant, ['channel' => $this->getChannel()]);
-        $penny = sprintf("%02d", $price % self::PENNY_VALUE);
-        $total = (int)($price / self::PENNY_VALUE);
-
-        $currencyCode = $this->getChannel()->getBaseCurrency()?->getCode();
-
-        return null === $currencyCode ? null : $total . '.' . $penny . ' ' . $currencyCode;
     }
 }

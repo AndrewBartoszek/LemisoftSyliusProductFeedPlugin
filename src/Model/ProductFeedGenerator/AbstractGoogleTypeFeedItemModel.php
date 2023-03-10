@@ -6,16 +6,15 @@ namespace Lemisoft\SyliusProductFeedsPlugin\Model\ProductFeedGenerator;
 
 use JMS\Serializer\Annotation as Serializer;
 use Lemisoft\SyliusProductFeedsPlugin\Entity\ProductFeed\ProductFeedInterface;
-use Lemisoft\SyliusProductFeedsPlugin\Model\Facebook\FacebookAvailabilityType;
-use Lemisoft\SyliusProductFeedsPlugin\Model\Facebook\FacebookProductConditionType;
+use Lemisoft\SyliusProductFeedsPlugin\Model\Facebook\GoogleAvailabilityType;
+use Lemisoft\SyliusProductFeedsPlugin\Model\Facebook\GoogleProductConditionType;
 use Lemisoft\SyliusProductFeedsPlugin\Model\FeedXmlNamespaceType;
-use Sylius\Component\Core\Model\Product;
+use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Model\ProductVariantInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[Serializer\XmlRoot("item")]
-final class FacebookFeedItemModel extends AbstractFeedItemModel implements FeedItemModelInterface
+abstract class AbstractGoogleTypeFeedItemModel extends AbstractFeedItemModel implements FeedItemModelInterface
 {
     public const EMPTY_LENGTH = 0;
     public const ONE_LENGTH = 1;
@@ -88,8 +87,8 @@ final class FacebookFeedItemModel extends AbstractFeedItemModel implements FeedI
     public function fromVariant(
         ProductVariantInterface $variant,
         ProductFeedInterface $productFeed,
-    ): FacebookFeedItemModel {
-        /** @var Product $product */
+    ): FeedItemModelInterface {
+        /** @var ProductInterface $product */
         $product = $variant->getProduct();
         /** @var int|null $productId */
         $productId = $product->getId();
@@ -102,7 +101,7 @@ final class FacebookFeedItemModel extends AbstractFeedItemModel implements FeedI
         /** //$this->gtin = $variant->getEan(); */
         $this->gtin = null;
         $this->description = $this->getDescription($product, $variant);
-        $this->condition = FacebookProductConditionType::NEW->value;
+        $this->condition = GoogleProductConditionType::NEW->value;
         $this->availability = $this->getAvailability($product, $variant);
         $this->stockCount = $this->getStockCount($variant);
 
@@ -129,9 +128,9 @@ final class FacebookFeedItemModel extends AbstractFeedItemModel implements FeedI
         $this->image = $url;
     }
 
-    protected function getAvailability(Product $product, ProductVariantInterface $variant): string
+    protected function getAvailability(ProductInterface $product, ProductVariantInterface $variant): string
     {
         return !$variant->isTracked() || $variant->isInStock() ?
-            FacebookAvailabilityType::IN_STOCK->value : FacebookAvailabilityType::OUT_OF_STOCK->value;
+            GoogleAvailabilityType::IN_STOCK->value : GoogleAvailabilityType::OUT_OF_STOCK->value;
     }
 }

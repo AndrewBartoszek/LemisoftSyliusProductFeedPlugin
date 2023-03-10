@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lemisoft\SyliusProductFeedsPlugin\Model\Facebook;
 
-enum FacebookAvailabilityType: string
+enum GoogleAvailabilityType: string
 {
     case IN_STOCK = 'in stock';
     case AVAILABLE_FOR_ORDER = 'available for order';
