@@ -7,8 +7,8 @@ namespace Lemisoft\SyliusProductFeedsPlugin\Service\ProductFeedGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use JMS\Serializer\SerializerInterface;
-use Lemisoft\SyliusProductFeedsPlugin\Model\ProductFeedGenerator\AbstractGoogleFeedItemModel;
 use Lemisoft\SyliusProductFeedsPlugin\Model\ProductFeedGenerator\FeedItemModelInterface;
+use Lemisoft\SyliusProductFeedsPlugin\Model\ProductFeedGenerator\GoogleFeedItemModel;
 use Lemisoft\SyliusProductFeedsPlugin\Model\ProductFeedGenerator\GoogleFeedXmlModel;
 use Lemisoft\SyliusProductFeedsPlugin\Repository\ProductRepositoryInterface;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
@@ -78,7 +78,7 @@ final class GoogleFeedGeneratorService extends AbstractBaseFeedGenerator
         ProductInterface $product,
         ProductVariantInterface $variant,
     ): FeedItemModelInterface {
-        $model = (new AbstractGoogleFeedItemModel())->fromVariant($variant, $this->getProductFeed());
+        $model = (new GoogleFeedItemModel())->fromVariant($variant, $this->getProductFeed());
         $model->setProductLink($this->prepareLink($product));
         $model->setPrice($this->getGoogleTypePrice($variant));
         $this->setImagesUrls($product, $variant, $model);

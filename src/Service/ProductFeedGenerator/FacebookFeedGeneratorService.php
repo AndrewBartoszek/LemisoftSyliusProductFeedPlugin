@@ -7,7 +7,7 @@ namespace Lemisoft\SyliusProductFeedsPlugin\Service\ProductFeedGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use JMS\Serializer\SerializerInterface;
-use Lemisoft\SyliusProductFeedsPlugin\Model\ProductFeedGenerator\FacebookFeedItemModelAbstract;
+use Lemisoft\SyliusProductFeedsPlugin\Model\ProductFeedGenerator\FacebookFeedItemModel;
 use Lemisoft\SyliusProductFeedsPlugin\Model\ProductFeedGenerator\FacebookFeedXmlModel;
 use Lemisoft\SyliusProductFeedsPlugin\Model\ProductFeedGenerator\FeedItemModelInterface;
 use Lemisoft\SyliusProductFeedsPlugin\Repository\ProductRepositoryInterface;
@@ -79,7 +79,7 @@ final class FacebookFeedGeneratorService extends AbstractBaseFeedGenerator
         ProductInterface $product,
         ProductVariantInterface $variant,
     ): FeedItemModelInterface {
-        $model = (new FacebookFeedItemModelAbstract())->fromVariant($variant, $this->getProductFeed());
+        $model = (new FacebookFeedItemModel())->fromVariant($variant, $this->getProductFeed());
         $model->setProductLink($this->prepareLink($product));
         $model->setPrice($this->getGoogleTypePrice($variant));
         $this->setImagesUrls($product, $variant, $model);

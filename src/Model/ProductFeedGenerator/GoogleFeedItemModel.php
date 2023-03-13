@@ -7,6 +7,6 @@ namespace Lemisoft\SyliusProductFeedsPlugin\Model\ProductFeedGenerator;
 use JMS\Serializer\Annotation as Serializer;
 
 #[Serializer\XmlRoot("item")]
-class AbstractGoogleFeedItemModel extends AbstractGoogleTypeFeedItemModel
+class GoogleFeedItemModel extends AbstractGoogleTypeFeedItemModel
 {
 }
