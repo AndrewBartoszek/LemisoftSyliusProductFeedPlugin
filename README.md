@@ -103,21 +103,86 @@ Każda wtyczka powinna zostać opublikowana w package registry zgodnie z numerac
 
 Instrukcja instalacji dostępna jest pod adresem https://gitlab.lemisoft.pl/help/user/packages/composer_repository/index#install-a-composer-package
 
-1. Dodać package registry url w pliku composer.json
+- Jeżeli w projekcie, gdzie chcemy użyć wtyczki, jest już osadzona własna wtyczka pochodząca z własnej dystrybucji
+   package registry, to należy przejść do kroku 3.
+   Dodać package registry url w pliku composer.json
    ```bash
-    composer config repositories.gitlab.lemisoft.pl/105 '{"type": "composer", "url": "https://gitlab.lemisoft.pl/api/v4/group/105/-/packages/composer/packages.json"}
+    composer config repositories.gitlab.lemisoft.pl/552 '{"type": "composer", "url": "https://gitlab.lemisoft.pl/api/v4/group/552/-/packages/composer/packages.json"}
    ```
-2. Wygenerować plik auth.json:
-   ```bash
-   composer config gitlab-token.gitlab.lemisoft.pl package_registry n52_REGt4a3cGfVZC_im
-   ```
-
-3. Dodać sekcje gitlab-domain w composer.json
+- Dodać sekcje gitlab-domain w composer.json
    ```bash
    composer config gitlab-domains gitlab.lemisoft.pl
    ```
-4. Zainstalować pakiet
+- Zainstalować pakiet
+    ```bash
+   composer require lemisoft/sylius-product-feeds-plugin
+   ```
+- Dodać zmienną z rodzajami feed-ów, które mają być dostępne w aplikacji:
+    ```bash
+    PRODUCT_FEED_AVAILABLE='["ceneo", "facebook", "google"]'
+    ```
+- Zaimportować plik konfiguracyjny:
+    ```text
+    @LemisoftSyliusProductFeedsPlugin/src/Resources/config/app/config.php
+    ```
+- Utworzyć plik encji:
+    ```php
+    declare(strict_types=1);
 
+    namespace App\Entity\ProductFeed;
+
+    use Lemisoft\SyliusProductFeedsPlugin\Entity\ProductFeed\ProductFeed as BaseProductFeed;
+
+    class ProductFeed extends BaseProductFeed
+    {
+
+    }
+    ```
+- Jeżeli sklep nie definiuje własnego pliku repozytorium dla encji Produkt należy dodać plik i zarejestrować w pliku config/packages/_sylius.yaml
+    ```bash
+    sylius_product:
+        resources:
+            product:
+                classes:
+                    repository: Lemisoft\Domain\Repository\ProductRepository #Przykladowy namespace do ProductRepository
+    ```
+
+- W pliku config/routes/sylius_admin.php dodać import:
+    ```php
+        $routes
+            ->import('@LemisoftSyliusProductFeedsPlugin/config/admin_routing.yml')
+            ->prefix('/%sylius_admin.path_name%');
+    ```
+- W pliku config/routes/sylius_shop.php dodać import:
+    ```php
+        $routes
+            ->import('@LemisoftSyliusProductFeedsPlugin/config/shop_routing.yml')
+            ->prefix('/{_locale}')
+            ->requirements(['_locale' => '%routing.locale%']);
+    ```
+- W pliku config/packages/doctrine.php zarejestrować typy:
+    ```php
+    use Lemisoft\SyliusProductFeedsPlugin\Resources\config\doctrine\enum\ProductNameModeType;
+    use Lemisoft\SyliusProductFeedsPlugin\Resources\config\doctrine\enum\FeedStateEnumType;
+    use Lemisoft\SyliusProductFeedsPlugin\Resources\config\doctrine\enum\FeedTypeEnumType;
+
+        $dbal->type('feed_type')->class(FeedTypeEnumType::class);
+        $dbal->type('feed_state')->class(FeedStateEnumType::class);
+        $dbal->type('product_name_mode')->class(ProductNameModeType::class);
+    ```
+- Wygenerować migracje:
+  ```bash
+    php bin/console doctrine:migrations:diff
+  ```
+- Wykonać migracje:
+  ```bash
+    php bin/console doctrine:migrations:migrate
+  ```
+- Wyczyścić cache aby pliki z tłumaczeniami zostały zaimportowane
+    ```bash
+    bin/console cache:clear
+    bin/console cache:warmup
+    ```
 ### Docker
 
 Do uruchomienia wtyczki potrzebujemy lokalnie zainstalowanych narzędzi:
